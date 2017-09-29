@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 
 public class LocalCacheUtils {
     private static final String CACHE_PATH= Environment.getExternalStorageDirectory().getAbsolutePath()+"/WerbNews";
-
+   //private static final String CACHE_PATH= getApplicationContext().getFilesDir().getPath()+"/WerbNews";
     /**
      * 从本地读取图片
      * @param url
@@ -42,7 +42,9 @@ public class LocalCacheUtils {
      */
     public void setBitmapToLocal(String url,Bitmap bitmap){
         try {
-            String fileName = "test";//把图片的url当做文件名,并进行MD5加密
+            String fileName = "test.png";//把图片的url当做文件名,并进行MD5加密
+
+            boolean ex = isExternalStorageWritable();
             File file=new File(CACHE_PATH,fileName);
 
             //通过得到文件的父文件,判断父文件是否存在
@@ -51,11 +53,22 @@ public class LocalCacheUtils {
                 parentFile.mkdirs();
             }
 
+
+            file.createNewFile();
+
             //把图片保存至本地
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,new FileOutputStream(file));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.longyuan.photocache.Utils;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
@@ -20,16 +21,17 @@ import rx.schedulers.Schedulers;
 
 public class NetCacheUtils {
 
-   // private LocalCacheUtils mLocalCacheUtils;
-    //private MemoryCacheUtils mMemoryCacheUtils;
+    private LocalCacheUtils mLocalCacheUtils;
+    private MemoryCacheUtils mMemoryCacheUtils;
 
 
     DownloadService downloadService;
 
 
-    public NetCacheUtils()//LocalCacheUtils localCacheUtils, MemoryCacheUtils memoryCacheUtils) {
+    public NetCacheUtils(LocalCacheUtils localCacheUtils, MemoryCacheUtils memoryCacheUtils)
     {
-
+        mLocalCacheUtils = localCacheUtils;
+        mMemoryCacheUtils = memoryCacheUtils;
     }
 
     /**
@@ -47,7 +49,8 @@ public class NetCacheUtils {
                 // .flatMap(processResponse())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bmp -> ivPic.setImageBitmap(bmp));
+                //.subscribe(bmp -> ivPic.setImageBitmap(bmp));
+                 .subscribe(bmp -> handleImage(bmp,ivPic));
     }
 
     public <T> T createService(Class<T> serviceClass, String baseUrl) {
@@ -56,5 +59,15 @@ public class NetCacheUtils {
                 .client(new OkHttpClient.Builder().build())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create()).build();
         return retrofit.create(serviceClass);
+    }
+
+    private void handleImage(Bitmap bitmap,ImageView imageView){
+
+        imageView.setImageBitmap(bitmap);
+
+        //mLocalCacheUtils.setBitmapToLocal("test",bitmap);
+
+        mMemoryCacheUtils.setBitmapToMemory("test",bitmap);
+
     }
 }
